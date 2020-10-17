@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Blockchain Tic Tac Toe</title>
+
+        <!-- CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/font-awesome.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
+        <!-- /CSS -->
+
+		    <!-- Script -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+		<script>
+      var GameAddress = '0xbd4b736C6C0Df4eF8dE862898078e89CEA0A44B4';
+      var KantiTokenAddress = '0xa3016b9AAfC82A621140D2b34B22eD43Fbd53fE7';
+
+			if (typeof window.web3 !== 'undefined') {
+					// Use Mist/MetaMask's provider
+					var web3js = new Web3(web3.currentProvider);
+			}
+			else {
+				alert("No MetaMask defined!");
+			}
+
+			var playGameContract = web3js.eth.contract(
+               [{"constant":true,"inputs":[],"name":"statusInit","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getPlayerA","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint8"},{"name":"k","type":"uint8"}],"name":"getFieldValue","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"whoseTurn","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"checkWinner","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getAllFieldValues","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"DefineUsers","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"i","type":"uint8"},{"name":"k","type":"uint8"}],"name":"Play","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"whoAmI","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"checkTime","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getPlayerB","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_KantiToken","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"Winner","type":"address"},{"indexed":false,"name":"message","type":"string"}],"name":"gameOver","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"mistake","type":"string"}],"name":"Error","type":"event"}]
+			);
+
+			var kantiToken = web3js.eth.contract(
+                [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"burn","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_value","type":"uint256"}],"name":"burnFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"},{"name":"_extraData","type":"bytes"}],"name":"approveAndCall","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"},{"name":"","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"initialSupply","type":"uint256"},{"name":"tokenName","type":"string"},{"name":"tokenSymbol","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Burn","type":"event"}
+                ]
+			);
+
+			// Address of deployed contract
+			var playGameContractInstance = playGameContract.at(GameAddress);
+			var kantiTokenInstance = kantiToken.at(KantiTokenAddress);
+
+			var playerId = 0;	   // save player id
+			var winShowed = false;
+
+			// Fill the game field
+			function fillFields() {
+				/*
+					  [1, 2, 3],
+					  [4, 5, 6],
+					  [7, 8, 9]
+		  	    */
+				// add leading 0 from the smart contract function
+				var s = "";
+				playGameContractInstance.getAllFieldValues(
+					function(err, res){
+						if (!err) {
+							s = res.c[0]+"";
+							while (s.length < 9) s = "0" + s;
+							console.log('all Fields: ',s);
+							var helper=0;
+							for (i=1; i<=9; i++) {
+								helper = parseInt(s.substr(9-i,1));
+								if (helper == 1){
+									$('#' + i).html('<span class="fa fa-times"></span>');
+								}
+								else if (helper == 2) {
+									$('#' + i).html('<span class="fa fa-circle-o"></span>');
+								}
+								else {
+									$('#' + i).html('');
+								}
+							}
+						}
+						else
+							console.log(err);
+				});
+
+				// check if somebody won
+				var win =0;
+				playGameContractInstance.checkWinner(
+					function(err, res){
+						if (!err) {
+							console.log('winner: ',res.c[0]);
+							win = res.c[0];
+							if (!winShowed && win == 1) {
+								$('#showWin').html('<span class="fa fa fa-times"></span> wins!');
+								winShowed = true;
+							}
+							else if (!winShowed && win == 2) {
+								$('#showWin').html('<span class="fa fa-circle-o"></span> wins!');
+								winShowed = true;
+							}
+							else if (!winShowed && win == 3) {
+								$('#showWin').html('No winner!');
+								winShowed = true;
+							}
+						}
+						else
+							console.log(err);
+				});
+
+				// check who has the next draw
+				var status = 0;
+				playGameContractInstance.statusInit(
+					function(err, res){
+						if (!err) {
+							console.log('statusInit: ',res.c[0]);
+							status = parseInt(res.c[0]);
+							if (status == 0) {
+								$('#showState').html('The game is finished.');
+								winShowed = false;
+							}
+							else if (status == 1) {
+								$('#showState').html('There is one player registered.');
+								winShowed = true;
+								$('#showWin').html('');
+							}
+							else if (status > 1) {
+								$('#showState').html('Game is running.');
+								winShowed = true;
+								$('#showWin').html('');
+								var turn = 0;
+								playGameContractInstance.whoseTurn(
+									function(err, res){
+										if (!err) {
+											console.log('whose Turn: ',res.c[0]);
+											turn = parseInt(res.c[0]);
+
+											if (turn == 1 && playerId == 1) {
+												$('#showTurn').html('It is your turn <span class="fa fa-times"></span>');
+											}
+											else if (turn == 2 && playerId == 2) {
+												$('#showTurn').html('It is your turn <span class="fa fa-circle-o"></span>');
+											}
+											else if (turn == 1 && playerId == 2) {
+												$('#showTurn').html('Wait for <span class="fa fa-times"></span> ');
+											}
+											else if (turn == 2 && playerId == 1) {
+												$('#showTurn').html('Wait for  <span class="fa fa-circle-o"></span> ');
+											}
+											else if (playerId == 0) {
+												if (turn == 1) {
+													$('#showTurn').html('Wait for <span class="fa fa-times"></span> ');
+												}
+												else if (turn == 2) {
+													$('#showTurn').html('Wait for  <span class="fa fa-circle-o"></span> ');
+												}
+											}
+										}
+										else
+											console.log(err);
+								});
+							}
+						}
+						else
+							console.log(err);
+				});
+
+			}
+
+			function approve() {
+				// Allow transaction
+				kantiTokenInstance.approve(GameAddress,
+					parseInt(web3.toWei(100000000000000000,'wei')),
+					function(err, res){
+					if (!err) {
+						console.log('result approve: ',res);
+					}
+					else
+						console.log(err);
+				});
+
+			}
+
+		 // initially set players
+			function setPlayer() {
+				var status = 0;
+
+				// check status
+				playGameContractInstance.statusInit(
+					function(err, res){
+						if (!err) {
+							console.log('status Init set player: ',res.c[0]);
+							status = parseInt(res.c[0]);
+							if (status == 0) {
+								playerId = 1;
+							}
+							else if (status == 1) {
+								playerId = 2;
+							}
+							else if (status == 2) {
+								playerId = 0;
+								return;
+							}
+							// Set Player
+							playGameContractInstance.DefineUsers(
+								function(err,res) {
+								if (!err) {
+									console.log('result define user => ',res);
+								}
+								else
+									console.log(err);
+							});
+						}
+						else {
+							console.log(err);
+						}
+				});
+			}
+
+			// if icon is choosen
+			function icon(id) {
+				console.log("Field choosen ",id);
+				switch (id) {
+					case '1':
+						playGameContractInstance.Play(1,1, function(err, res){
+						if (!err) {
+							console.log('play11: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '2':
+						playGameContractInstance.Play(1,2, function(err, res){
+						if (!err) {
+							console.log('play12: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '3':
+						playGameContractInstance.Play(1,3, function(err, res){
+						if (!err) {
+							console.log('play13: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '4':
+						playGameContractInstance.Play(2,1, function(err, res){
+						if (!err) {
+							console.log('play21: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '5':
+						playGameContractInstance.Play(2,2, function(err, res){
+						if (!err) {
+							console.log('play22: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '6':
+						playGameContractInstance.Play(2,3, function(err, res){
+						if (!err) {
+							console.log('play23: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '7':
+						playGameContractInstance.Play(3,1, function(err, res){
+						if (!err) {
+							console.log('play31: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '8':
+						playGameContractInstance.Play(3,2, function(err, res){
+						if (!err) {
+							console.log('play32: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+					case '9':
+						playGameContractInstance.Play(3,3, function(err, res){
+						if (!err) {
+							console.log('play33: ',res);
+						}
+						else {
+							console.log(err);
+						}});
+						break;
+				}
+			}
+
+			// update fields, status every 10 seconds
+			function update() {
+				fillFields();
+				setTimeout(update,10000);
+			}
+
+			update();
+
+		</script>
+    </head>
+	  <body>
+		<div class="container">
+			<h4 style="color:white;"> Blockchain Tic Tac Toe Game </h4>
+			<button type="button" class="btn" onClick="approve();">Approve Token</button>
+			<button type="button" class="btn" onClick="setPlayer();">Start Game</button>
+
+			<div class="game">
+				<div id="1" onClick="icon(this.id)" class="game-field" style="border-bottom: 3px solid #525B76;"></div>
+				<div id="2" onClick="icon(this.id)" class="game-field" style="border-bottom: 3px solid #525B76;border-left: 3px solid #525B76; border-right: 3px solid #525B76;"></div>
+				<div id="3" onClick="icon(this.id)" class="game-field" style="border-bottom: 3px solid #525B76;"></div>
+				<div id="4" onClick="icon(this.id)" class="game-field" style="border-bottom: 3px solid #525B76;"></div>
+				<div id="5" onClick="icon(this.id)" class="game-field" style="border-bottom: 3px solid #525B76; border-left: 3px solid #525B76; border-right: 3px solid #525B76;"></div>
+				<div id="6" onClick="icon(this.id)" class="game-field" style="border-bottom: 3px solid #525B76;"></div>
+				<div id="7" onClick="icon(this.id)" class="game-field"></div>
+				<div id="8" onClick="icon(this.id)" class="game-field" style="border-left: 3px solid #525B76; border-right: 3px solid #525B76;"></div>
+				<div id="9" onClick="icon(this.id)" class="game-field"></div>
+			</div>
+
+			<div class="signature" style="color:white;">
+				<h4>Information</h4>
+				Status: <span id="showState" style="color:white;"> </span> <br>
+				Next draw: <span id="showTurn" style="color:white;"> </span> <br>
+				Winner: <span id="showWin" style="color:white;"> </span><br>
+			</div>
+		</div>
+    </body>
+</html>
